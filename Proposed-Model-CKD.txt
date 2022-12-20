@@ -1,0 +1,80 @@
+ProposedSpatial_code=nimbleCode({ 
+    # Likelihood
+
+for(i in 1:n){
+       theta[i] <- exp(beta[1]*x1[i]+beta[2]*x2[i]+beta[3]*x3[i]+beta[4]*x4[i]+u[i]+s[i])
+
+
+        mu[i] <- E[i]*theta[i]*epsilon[i]
+        y[i]  ~ dpois(mu[i])
+        y.new[i]  ~ dpois(mu[i])
+             
+         g[i] ~ dcat(psi[i,1:K])
+       epsilon[i] <- gamma[g[i]]            
+}
+    
+    #Conditional uniform prior for parameter vector gamma:
+    #Oliveira at al. (2021) prior on parameter gamma:
+
+      gamma[1] ~ dunif(min=0.90,max=1)
+      for(clus in 2:K){
+      gamma[clus] ~ dunif(min=0.3,max=0.90)}
+
+
+    ##prior for the regression intercept (the Gaussian distribution is parametrized in terms of precision parameter):
+    
+    #### Prior for the regression parameters:
+
+    for(j in 1:4){
+        beta[j] ~ dnorm(0,sd=10)
+    }
+    
+
+  nu ~ dgamma(2,0.01)
+
+  tau <- 1/(nu^2)
+
+
+ nu.s ~dgamma(0.5,0.05)
+
+ tau.s <- 1/nu.s
+
+    s[1:n_regions] ~ dcar_normal(adj=adj[1:l_adj], num=n_adj[1:n_regions], tau=tau.s, zero_mean=1)
+    
+    ##Local random effect
+
+    for(i in 1:n){
+        u[i]~dnorm(0, sd=tau)}
+    
+    
+
+# Probit Stick Breaking Process (Truncated)
+ 
+    for(i in 1:n){
+
+        for(clus in 1:(K-1)){
+
+V[i,clus] <- pnorm(z1[i]*eta1[clus])}}
+
+
+    for(clus in 1:K){
+
+        eta1[clus] ~ dnorm(etal, sd=1)
+        eta2[clus] ~ dnorm(etal, sd=1)
+      
+ }  
+
+etal ~ dnorm(0,sd=1)
+
+eta0 ~ dnorm(0,sd=1)
+ 
+
+for(i in 1:n){
+psi[i,1:K] <- stick_breaking(V[i,1:(K-1)])}
+ 
+ 
+})
+
+
+
+
