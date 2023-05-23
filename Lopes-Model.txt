@@ -1,0 +1,43 @@
+Lopes_code=nimbleCode({
+    # Likelihood
+for(i in 1:n){
+        
+        epsilon[i] <- 1-inprod(hAI[i,1:K],gamma[1:K])
+        theta[i] <- exp(beta[1]*x1[i]+beta[2]*x2[i]+u[i])
+        lambda[i] <- E[i]*theta[i]
+        T[i] ~ dpois(lambda[i])
+        mu[i] <- E[i]*theta[i]*epsilon[i]
+        y[i]  ~ dpois(mu[i])
+    }
+    
+    #Conditional uniform prior for parameter vector gamma:
+    #Oliveira at al. (2021) prior on parameter gamma::
+    #Conditional uniform prior for parameter vector gamma:
+    gamma[1] ~ dunif(min = a[1], max = b[1])
+    for(j in 2:K){
+      gamma[j] ~ dunif(min = a[j]*(1-sum(gamma[1:(j-1)])),
+      max = b[j]*(1-sum(gamma[1:(j-1)])))
+    }
+
+
+#### Prior for the regression parameters:
+    for(j in 1:2){
+        beta[j] ~ dnorm(0,sd=10)
+    }
+    
+#nu ~ T(dnorm(0,1),0,)
+  #tau <- 1/nu^2
+    
+
+    for(i in 1:n){
+        u[i]~dnorm(0, sd=tau_u)
+          }
+    inv.tau~dgamma(2,0.1)
+      
+      tau_u <- 1/sqrt(inv.tau)
+    
+})
+
+
+
+
