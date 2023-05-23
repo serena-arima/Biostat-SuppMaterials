@@ -162,9 +162,9 @@ SC_compiled_mcmc <- compileNimble(SC_mcmc, project = SC_model, resetFunctions = 
 
 seed=123
 
-it=15000
+it=80000
 bu=5000
-th=10
+th=5
 
 SC_samples_Lopes=runMCMC(SC_compiled_mcmc, inits=SC_inits,
                    nchains = 2, nburnin=bu, niter = it, samplesAsCodaMCMC = TRUE,
