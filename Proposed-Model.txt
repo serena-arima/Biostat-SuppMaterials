@@ -1,0 +1,70 @@
+Proposed_code=nimbleCode({ 
+    # Likelihood
+for(i in 1:n){
+        
+        #epsilon[i] <-  gamma[g[i]]   
+
+epsilon[i] <- gamma[1]*equals(g[i],1)+ gamma[2]*equals(g[i],2) + gamma[3]*equals(g[i],3) + gamma[4]*equals(g[i],4)+ gamma[5]*equals(g[i],5)+gamma[6]*equals(g[i],6)+gamma[7]*equals(g[i],7)+
+gamma[8]*equals(g[i],8)+gamma[9]*equals(g[i],9)+gamma[10]*equals(g[i],10)
+         
+        theta[i] <- exp(beta[1]*x1[i]+beta[2]*x2[i]+u[i])
+        lambda[i] <- E[i]*theta[i]
+        T[i] ~ dpois(lambda[i])
+        mu[i] <- E[i]*theta[i]*epsilon[i]
+        y[i]  ~ dpois(mu[i])
+             
+        g[i] ~ dcat(psi[i,1:K])
+    
+}
+    
+    #Conditional uniform prior for parameter vector gamma:
+    #Oliveira at al. (2021) prior on parameter gamma:
+
+      gamma[1] ~ dunif(min=a0,max=a1)
+for(clus in 2:K){
+      gamma[clus] ~ dunif(min=0.3,max=a0)}
+
+
+    
+    #### Prior for the regression parameters:
+
+    for(j in 1:2){
+        beta[j] ~ dnorm(0,sd=10)
+    }
+    
+   
+    
+  ##Local random effect
+    for(i in 1:n){
+        u[i]~dnorm(0, sd=tau_u)
+        }
+    inv.tau~dgamma(2,0.1)
+    
+    tau_u <- 1/sqrt(inv.tau)
+    
+   
+# Probit Stick Breaking Process (Truncated)
+ 
+    for(i in 1:n){
+
+        for(clus in 1:(K-1)){
+
+V[i,clus] <- pnorm(z1[i]*eta[clus])}}
+
+    for(clus in 1:K){
+
+        eta[clus] ~ dnorm(etal, sd=1)
+
+      
+ }  
+
+etal ~ dnorm(0,sd=1)
+
+
+ 
+for(i in 1:n){
+psi[i,1:K] <- stick_breaking(V[i,1:(K-1)])}
+ 
+ 
+})
+

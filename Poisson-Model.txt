@@ -1,0 +1,32 @@
+Poisson_code=nimbleCode({ 
+    # Likelihood
+for(i in 1:n){
+               
+        theta[i] <- exp(beta[1]*x1[i]+beta[2]*x2[i]+u[i])
+        mu[i] <- E[i]*theta[i]
+        epsilon[i] <- E[i]*theta[i]
+        lambda[i] <- E[i]*theta[i]
+
+        y[i]  ~ dpois(mu[i])}
+             
+       
+    #### Prior for the regression parameters:
+    for(j in 1:2){
+        beta[j] ~ dnorm(0,sd=10)
+    }
+    
+     
+   for(i in 1:n){
+        u[i]~dnorm(0, sd=tau_u)
+        }
+    inv.tau~dgamma(2,0.1)
+    
+    tau_u <- 1/sqrt(inv.tau)
+  
+      
+
+ })
+
+
+
+
